@@ -69,33 +69,33 @@ def make_disable(modeladmin, request, queryset):
     ) % updated, messages.SUCCESS)
 
 
-# class MyAdminSite(admin.AdminSite):
-#     def get_app_list(self, request):
-#         ordering = {
-#             "Countries": 1,
-#             "Regions": 2,
-#             "Cities": 3,
-#             "Company Types": 4,
-#             "Companies": 5,
-#             "Users": 6,
-#             "Groups": 7
-#         }
-#         app_dict = self._build_app_dict(request)
-#         # a.sort(key=lambda x: b.index(x[0]))
-#         # Sort the apps alphabetically.
-#         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
-#         all_list = super().get_app_list(request)
-#
-#         # Sort the models alphabetically within each app.
-#         for app in app_list:
-#             app['models'].sort(key=lambda x: ordering[x['name']])
-#
-#         return app_list
-#
-#
-# mysite = MyAdminSite()
-# admin.site = mysite
-# sites.site = mysite
+class MyAdminSite(admin.AdminSite):
+    def get_app_list(self, request):
+        ordering = {
+            "Countries": 1,
+            "Regions": 2,
+            "Cities": 3,
+            "Company Types": 4,
+            "Companies": 5,
+            "Users": 6,
+            "Groups": 7
+        }
+        app_dict = self._build_app_dict(request)
+        # a.sort(key=lambda x: b.index(x[0]))
+        # Sort the apps alphabetically.
+        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
+        all_list = super().get_app_list(request)
+
+        # Sort the models alphabetically within each app.
+        for app in app_list:
+            app['models'].sort(key=lambda x: ordering[x['name']])
+
+        return app_list
+
+
+mysite = MyAdminSite()
+admin.site = mysite
+sites.site = mysite
 
 make_disable.short_description = "Delete selected"
 
