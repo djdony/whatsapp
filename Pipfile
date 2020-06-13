@@ -11,6 +11,7 @@ pillow = "*"
 django-extensions = "*"
 mysqlclient = "*"
 django-environ = "*"
+django-bootstrap-breadcrumbs = "*"
 
 [requires]
 python_version = "3.8"
