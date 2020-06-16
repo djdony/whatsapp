@@ -36,8 +36,8 @@ class MyAccountManager(BaseUserManager):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT, null=True, related_name='profile')
-    first_name = models.CharField(max_length=30, blank=True)
-    last_name = models.CharField(max_length=30, blank=True)
+    first_name = models.CharField(max_length=30, blank=True, db_index=True)
+    last_name = models.CharField(max_length=30, blank=True, db_index=True)
     address = models.CharField(max_length=30, blank=True)
     whatsapp = models.CharField(max_length=30, blank=True)
 
@@ -46,8 +46,9 @@ class Profile(models.Model):
 def update_profile_signal(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+    else:
+        return
     instance.profile.save()
-
 
 # TODO models
 '''

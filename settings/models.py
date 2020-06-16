@@ -1,11 +1,12 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django_extensions.db.models import TimeStampedModel
 
 
 class Country(TimeStampedModel, models.Model):
     code = models.CharField(max_length=2, unique=True)
-    name = models.CharField(max_length=100)
-    currency = models.CharField(max_length=2)
+    name = models.CharField(max_length=100, db_index=True)
+    currency = models.CharField(max_length=3)
     status = models.BooleanField(default=1)
 
     def __str__(self):
@@ -17,9 +18,9 @@ class Country(TimeStampedModel, models.Model):
 
 
 class Region(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     status = models.BooleanField(default=1)
-    country_id = models.ForeignKey(Country, on_delete=models.PROTECT, related_name='region')
+    country = models.ForeignKey(Country, on_delete=models.PROTECT, related_name='region')
 
     def __str__(self):
         return self.name
@@ -30,9 +31,9 @@ class Region(TimeStampedModel, models.Model):
 
 
 class City(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     status = models.BooleanField(default=1)
-    region_id = models.ForeignKey(Region, on_delete=models.PROTECT, related_name='city')
+    region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name='city')
 
     def __str__(self):
         return self.name
@@ -43,7 +44,7 @@ class City(TimeStampedModel, models.Model):
 
 
 class CompanyType(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     status = models.BooleanField(default=1)
 
     def __str__(self):
@@ -55,15 +56,16 @@ class CompanyType(TimeStampedModel, models.Model):
 
 
 class Company(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, db_index=True)
     adress = models.CharField(max_length=200, null=True, blank=True)
     whatsapp = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=200)
-    www = models.URLField(null=True)
+    www = models.URLField(null=True, blank=True)
     logo = models.ImageField(upload_to='uploads/company', null=True, blank=True)
     status = models.BooleanField(default=1)
-    city_id = models.ForeignKey(Region, on_delete=models.PROTECT)
-    company_type_id = models.ForeignKey(CompanyType, on_delete=models.PROTECT)
+    city = models.ForeignKey(City, on_delete=models.PROTECT)
+    company_type = models.ForeignKey(CompanyType, on_delete=models.PROTECT)
+    user = models.ManyToManyField(User, blank=True, related_name='companies')
 
     class Meta:
         verbose_name = 'Company'

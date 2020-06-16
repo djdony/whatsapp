@@ -10,42 +10,49 @@ class CountryAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CountryAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = ['id', 'code', 'name', 'status']
+    list_display = list_display_links = ['id', 'code', 'name', 'status']
     exclude = ['status']
+    search_fields = ('name',)
 
 
 class RegionAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(RegionAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = ['id', 'name', 'status', 'country_id']
+    list_display = list_display_links = ['id', 'name', 'status', 'country']
     exclude = ['status']
-    list_filter = ('status', 'country_id')
+    list_filter = ('status', 'country')
+    search_fields = ('name',)
 
 
 class CityAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CityAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = ['id', 'name', 'status', 'region_id']
+    list_display = ['id', 'name', 'status', 'region']
+    list_display_links = ['id', 'name']
     exclude = ['status']
-    list_filter = ('status', 'region_id')
+    list_filter = ('status', 'region')
+    list_editable = ('status', 'region')
+    search_fields = ('name',)
 
 
 class CompanyTypeAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CompanyTypeAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = ['id', 'name', 'status']
+    list_display = list_display_links = ['id', 'name', 'status']
     exclude = ['status']
+    search_fields = ('name',)
 
 
 class CompanyAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CompanyAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = ['id', 'name', 'company_type_id', 'city_id', 'whatsapp', 'email', 'www']
+    list_display = list_display_links = ['id', 'name', 'company_type', 'city', 'whatsapp', 'email', 'www']
     exclude = ['status']
+    search_fields = ('name',)
 
 
 def make_active(modeladmin, request, queryset):

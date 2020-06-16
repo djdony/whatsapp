@@ -1,12 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from .forms import UserRegisterForm, UserLoginForm, UserProfileForm, ChangePassword
 from settings.forms import CompanyForm
+from .models import Profile
+from settings.models import Company
 
 
 def index(request):
@@ -15,13 +17,37 @@ def index(request):
 
 @login_required
 def profile(request):
-    form = UserProfileForm()
+    try:
+        user_profile = request.user.profile
+    except Profile.DoesNotExist:
+        user_profile = Profile(user=request.user)
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Data Updated successfully.')
+            return redirect('profile')
+    else:
+        form = UserProfileForm(instance=user_profile)
     return render(request, 'partials/form.html', {'form': form})
 
 
 @login_required
 def company(request):
-    form = CompanyForm()
+    try:
+        user_company = request.user.companies
+    except Company.DoesNotExist:
+        user_company = Company(user=request.user)
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, instance=user_company)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Data inserted successfully.')
+            return redirect('company')
+        else:
+            messages.error(request, 'Please correct the error below.')
+
+    form = CompanyForm(instance=user_company)
     return render(request, 'partials/form.html', {'form': form})
 
 
@@ -65,7 +91,7 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')
+            return redirect('profile')
     else:
         form = UserLoginForm()
     return render(request, 'auth/login.html', {"form": form})

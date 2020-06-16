@@ -6,11 +6,13 @@ from .models import Profile
 
 
 class UserLoginForm(AuthenticationForm):
+    error_css_class = 'error'
     username = forms.CharField(label='Login', widget=forms.TextInput(attrs={'class': 'form-control'}))
     password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
 
 class UserRegisterForm(UserCreationForm):
+    error_css_class = 'error'
     CHOICES = [('customer', 'Customer'), ('company', 'Company')]
     username = forms.CharField(label='Login', help_text='Maximum 150 chars',
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -25,6 +27,7 @@ class UserRegisterForm(UserCreationForm):
 
 
 class ChangePassword(PasswordChangeForm):
+    error_css_class = 'error'
     old_password = forms.CharField(label='Old Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     new_password1 = forms.CharField(label='New Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     new_password2 = forms.CharField(label='Confirm Password', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -34,7 +37,8 @@ class ChangePassword(PasswordChangeForm):
         field_order = ['old_password', 'new_password1', 'new_password2']
 
 
-class UserProfileForm(forms.Form):
+class UserProfileForm(forms.ModelForm):
+    error_css_class = 'error'
     first_name = forms.CharField(label='First Name', widget=forms.TextInput(attrs={'class': 'form-control'}))
     last_name = forms.CharField(label='Last Name', widget=forms.TextInput(attrs={'class': 'form-control'}))
     address = forms.CharField(label='Address', widget=forms.TextInput(attrs={'class': 'form-control'}))
