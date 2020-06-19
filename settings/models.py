@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
+from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
 
 
@@ -18,7 +20,7 @@ class Country(TimeStampedModel, models.Model):
 
 
 class Region(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, unique=True)
     status = models.BooleanField(default=1)
     country = models.ForeignKey(Country, on_delete=models.PROTECT, related_name='region')
 
@@ -31,7 +33,7 @@ class Region(TimeStampedModel, models.Model):
 
 
 class City(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, unique=True)
     status = models.BooleanField(default=1)
     region = models.ForeignKey(Region, on_delete=models.PROTECT, related_name='city')
 
@@ -44,7 +46,7 @@ class City(TimeStampedModel, models.Model):
 
 
 class CompanyType(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, db_index=True, unique=True)
     status = models.BooleanField(default=1)
 
     def __str__(self):
@@ -56,18 +58,30 @@ class CompanyType(TimeStampedModel, models.Model):
 
 
 class Company(TimeStampedModel, models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    name = models.CharField(max_length=100, db_index=True, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
     adress = models.CharField(max_length=200, null=True, blank=True)
     whatsapp = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=200)
     www = models.URLField(null=True, blank=True)
-    logo = models.ImageField(upload_to='uploads/company', null=True, blank=True)
+    logo = models.ImageField(upload_to='company', null=True, blank=True)
     status = models.BooleanField(default=1)
-    city = models.ForeignKey(City, on_delete=models.PROTECT)
-    company_type = models.ForeignKey(CompanyType, on_delete=models.PROTECT)
-    user = models.ManyToManyField(User, blank=True, related_name='companies')
+    city = models.ForeignKey(City, on_delete=models.PROTECT, related_name='company')
+    company_type = models.ForeignKey(CompanyType, on_delete=models.PROTECT, related_name='company')
+    users = models.ManyToManyField(User, blank=True, related_name='companies')
 
     class Meta:
         verbose_name = 'Company'
         verbose_name_plural = 'Companies'
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('article_detail', kwargs={'slug': self.slug})
+
+    def save(self, *args, **kwargs): # new
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 

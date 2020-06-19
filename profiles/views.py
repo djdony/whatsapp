@@ -3,16 +3,28 @@ from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group, User
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.safestring import mark_safe
 
 from .forms import UserRegisterForm, UserLoginForm, UserProfileForm, ChangePassword
 from settings.forms import CompanyForm
 from .models import Profile
 from settings.models import Company
+from django.forms.utils import ErrorList
 
 
 def index(request):
     return render(request, 'home.html')
+
+
+class DivErrorList(ErrorList):
+    def __str__(self):
+        return self.as_divs()
+
+    def as_divs(self):
+        if not self:
+            return ''
+        return mark_safe(''.join(['<div class="alert alert-danger" role="alert">%s</div>' % e for e in self]))
 
 
 @login_required
@@ -33,22 +45,49 @@ def profile(request):
 
 
 @login_required
-def company(request):
-    try:
-        user_company = request.user.companies
-    except Company.DoesNotExist:
-        user_company = Company(user=request.user)
+def company_edit(request, slug):
+    company = get_object_or_404(Company, slug=slug, users=request.user)
     if request.method == 'POST':
-        form = CompanyForm(request.POST, instance=user_company)
+        form = CompanyForm(request.POST, request.FILES, error_class=DivErrorList, instance=company)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.INFO, 'Data inserted successfully.')
+
+            messages.success(request, 'Data inserted successfully.')
             return redirect('company')
         else:
             messages.error(request, 'Please correct the error below.')
 
-    form = CompanyForm(instance=user_company)
+    form = CompanyForm(instance=company)
     return render(request, 'partials/form.html', {'form': form})
+
+
+@login_required
+def company_add(request):
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, request.FILES, error_class=DivErrorList)
+        if form.is_valid():
+            company = form.save()
+            company.users.add(request.user)
+            messages.success(request, 'Data inserted successfully.')
+            return redirect('company')
+    else:
+        form = CompanyForm()
+    return render(request, 'partials/form.html', {'form': form})
+
+
+@login_required
+def company(request):
+    companies = Company.objects.filter(users__exact=request.user, status__exact=1)
+    return render(request, 'company.html', context={'companies': companies})
+
+
+@login_required
+def company_delete(request, slug):
+    user_company = get_object_or_404(Company, slug=slug, users=request.user)
+    user_company.status=0
+    user_company.save()
+    messages.success(request, 'Data deleted successfully.')
+    return company(request)
 
 
 @login_required

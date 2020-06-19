@@ -38,8 +38,8 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.PROTECT, null=True, related_name='profile')
     first_name = models.CharField(max_length=30, blank=True, db_index=True)
     last_name = models.CharField(max_length=30, blank=True, db_index=True)
-    address = models.CharField(max_length=30, blank=True)
-    whatsapp = models.CharField(max_length=30, blank=True)
+    address = models.CharField(max_length=150, blank=True)
+    whatsapp = models.CharField(max_length=15, blank=True)
 
 
 @receiver(post_save, sender=User)

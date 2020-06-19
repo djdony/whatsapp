@@ -6,7 +6,7 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
-base = environ.Path(__file__) - 3 # Three folders back (/a/b/ - 2 = /)
+base = environ.Path(__file__) - 2 # Three folders back (/a/b/ - 2 = /)
 environ.Env.read_env(env_file=base('.env')) # reading .env file
 
 
@@ -29,8 +29,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'profiles',
-    'settings',
+    'profiles.apps.ProfilesConfig',
+    'settings.apps.SettingsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,3 +127,6 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

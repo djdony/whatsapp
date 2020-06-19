@@ -1,0 +1,54 @@
+{% extends 'layout/base.html' %}
+{% load static %}
+
+{% block content %}
+        <div class="row">
+            <div class="col-md-3 mt-4">
+                {% include 'partials/profile-sidebar.html' %}
+            </div>
+            <div class="col-md-9">
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <div
+                                    {% if message.tags %}
+                                        class="alert alert-{{ message.tags }}"{% endif %}>{{ message }}
+                            </div>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if companies %}
+                    <div class="row">
+                        {% for company in companies %}
+                            <div class="col-md-3 mt-4 col-xs-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        {% if company.logo %}
+                                            <img class="card-img-top" src="{{ company.logo.url }}" class="card-img-top"
+                                                 alt="{{ company.logo.name }}">
+                                            {% else %}
+                                            <img class="card-img-top" src="{% static 'img/no-logo.png' %}" alt="Card image cap">
+                                        {% endif %}
+                                        <h5 class="card-title">{{ company.name }}</h5>
+                                        <p class="card-text">{{ company.city }}</p>
+
+                                        <a href="{% url 'company_edit' slug=company.slug %}" class="btn btn-primary">Edit</a>
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-href="{% url 'company_delete' slug=company.slug %}" data-target="#confirm-delete">
+  Delete
+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% include 'partials/delete_modal.html' %}
+
+                {% endif %}
+            <div class="col-md-9">
+                <div class="row mt-5 justify-content-center">
+                    <a href="{% url 'company_add' %}" class="btn btn-primary">Add Company</a>
+                </div>
+            </div>
+
+            </div>
+        </div>
+{% endblock %}

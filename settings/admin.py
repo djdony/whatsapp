@@ -53,6 +53,7 @@ class CompanyAdmin(admin.ModelAdmin):
     list_display = list_display_links = ['id', 'name', 'company_type', 'city', 'whatsapp', 'email', 'www']
     exclude = ['status']
     search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}  # new
 
 
 def make_active(modeladmin, request, queryset):
