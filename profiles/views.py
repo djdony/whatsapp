@@ -1,16 +1,15 @@
 from django.contrib import messages
-from django.contrib.auth import login, logout, update_session_auth_hash
+from django.contrib.auth import login, logout, update_session_auth_hash, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group, User
-from django.http import HttpResponse
-from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import Group
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 
 from .forms import UserRegisterForm, UserLoginForm, UserProfileForm, ChangePassword
-from settings.forms import CompanyForm
 from .models import Profile
-from settings.models import Company
 from django.forms.utils import ErrorList
+from django.views.generic import ListView, CreateView, DeleteView, UpdateView
 
 
 def index(request):
@@ -45,52 +44,6 @@ def profile(request):
 
 
 @login_required
-def company_edit(request, slug):
-    company = get_object_or_404(Company, slug=slug, users=request.user)
-    if request.method == 'POST':
-        form = CompanyForm(request.POST, request.FILES, error_class=DivErrorList, instance=company)
-        if form.is_valid():
-            form.save()
-
-            messages.success(request, 'Data inserted successfully.')
-            return redirect('company')
-        else:
-            messages.error(request, 'Please correct the error below.')
-
-    form = CompanyForm(instance=company)
-    return render(request, 'partials/form.html', {'form': form})
-
-
-@login_required
-def company_add(request):
-    if request.method == 'POST':
-        form = CompanyForm(request.POST, request.FILES, error_class=DivErrorList)
-        if form.is_valid():
-            company = form.save()
-            company.users.add(request.user)
-            messages.success(request, 'Data inserted successfully.')
-            return redirect('company')
-    else:
-        form = CompanyForm()
-    return render(request, 'partials/form.html', {'form': form})
-
-
-@login_required
-def company(request):
-    companies = Company.objects.filter(users__exact=request.user, status__exact=1)
-    return render(request, 'company.html', context={'companies': companies})
-
-
-@login_required
-def company_delete(request, slug):
-    user_company = get_object_or_404(Company, slug=slug, users=request.user)
-    user_company.status=0
-    user_company.save()
-    messages.success(request, 'Data deleted successfully.')
-    return company(request)
-
-
-@login_required
 def change_password(request):
     if request.method == 'POST':
         form = ChangePassword(request.user, request.POST)
@@ -106,22 +59,20 @@ def change_password(request):
     return render(request, 'partials/form.html', {'form': form})
 
 
-def register(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(data=request.POST)
-        if form.is_valid():
-            user = form.save()
-            if form.cleaned_data['role'] == 'company':
-                group = Group.objects.get(name='Company')
-                group.user_set.add(user)
-            login(request, user)
-            messages.success(request, 'Success')
-            return redirect('profile')
-        else:
-            messages.error(request, 'Error')
-    else:
-        form = UserRegisterForm()
-    return render(request, 'auth/register.html', {"form": form})
+class Register(CreateView):
+    form_class = UserRegisterForm
+    template_name = 'auth/register.html'
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        user = super(Register, self).form_valid(form)
+        username, password = form.cleaned_data.get('username'), form.cleaned_data.get('password1')
+        new_user = authenticate(username=username, password=password)
+        login(self.request, new_user)
+        if form.cleaned_data['role'] == 'company':
+            group = Group.objects.get(name='Company')
+            group.user_set.add()
+        return user
 
 
 def user_login(request):

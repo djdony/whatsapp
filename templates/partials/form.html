@@ -1,4 +1,5 @@
 {% extends 'layout/base.html' %}
+{% load i18n %}
 {% block content %}
     <div class="row">
         <div class="col-md-3">
@@ -27,7 +28,7 @@
             </div>
             {% endfor %}
 
-            <button type="submit" class="btn btn-primary btn-block">Update</button>
+            <button type="submit" class="btn btn-primary btn-block">{% trans 'Update' %}</button>
         </form>
     </div>
 </div>

@@ -1,7 +1,8 @@
+{% load i18n %}
 {% with url_name=request.resolver_match.url_name %}
             <div class="list-group">
-                <a href="{% url 'profile' %}" class="list-group-item list-group-item-action {% if url_name == 'profile' %}active{% endif %}">Profile</a>
-                <a href="{%url 'company'%}" class="list-group-item list-group-item-action {% if url_name == 'company' %}active{% endif %}">Company</a>
-                <a href="{%url 'change_password'%}" class="list-group-item list-group-item-action {% if url_name == 'change_password' %}active{% endif %}">Change Password</a>
+                <a href="{% url 'profile' %}" class="list-group-item list-group-item-action {% if url_name == 'profile' %}active{% endif %}">{% trans 'Profile' %}</a>
+                <a href="{%url 'company'%}" class="list-group-item list-group-item-action {% if url_name == 'company' %}active{% endif %}">{% trans 'Company' %}</a>
+                <a href="{%url 'change_password'%}" class="list-group-item list-group-item-action {% if url_name == 'change_password' %}active{% endif %}">{% trans 'Change Password' %}</a>
             </div>
 {% endwith %}

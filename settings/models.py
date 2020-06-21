@@ -3,6 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django_extensions.db.models import TimeStampedModel
+from django.utils.translation import gettext_lazy as _
 
 
 class Country(TimeStampedModel, models.Model):
@@ -15,8 +16,8 @@ class Country(TimeStampedModel, models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Country'
-        verbose_name_plural = 'Countries'
+        verbose_name = _('Country')
+        verbose_name_plural = _('Countries')
 
 
 class Region(TimeStampedModel, models.Model):
@@ -28,8 +29,8 @@ class Region(TimeStampedModel, models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Region'
-        verbose_name_plural = 'Regions'
+        verbose_name = _('Region')
+        verbose_name_plural = _('Regions')
 
 
 class City(TimeStampedModel, models.Model):
@@ -41,8 +42,8 @@ class City(TimeStampedModel, models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'City'
-        verbose_name_plural = 'Cities'
+        verbose_name = _('City')
+        verbose_name_plural = _('Cities')
 
 
 class CompanyType(TimeStampedModel, models.Model):
@@ -53,14 +54,14 @@ class CompanyType(TimeStampedModel, models.Model):
         return self.name
 
     class Meta:
-        verbose_name = 'Company Type'
-        verbose_name_plural = 'Company Types'
+        verbose_name = _('Company Type')
+        verbose_name_plural = _('Company Types')
 
 
 class Company(TimeStampedModel, models.Model):
     name = models.CharField(max_length=100, db_index=True, unique=True)
     slug = models.SlugField(max_length=100, unique=True)
-    adress = models.CharField(max_length=200, null=True, blank=True)
+    address = models.CharField(max_length=200, null=True, blank=True)
     whatsapp = models.CharField(max_length=100, null=True, blank=True)
     email = models.EmailField(max_length=200)
     www = models.URLField(null=True, blank=True)
@@ -71,8 +72,8 @@ class Company(TimeStampedModel, models.Model):
     users = models.ManyToManyField(User, blank=True, related_name='companies')
 
     class Meta:
-        verbose_name = 'Company'
-        verbose_name_plural = 'Companies'
+        verbose_name = _('Company')
+        verbose_name_plural = _('Companies')
 
     def __str__(self):
         return self.name

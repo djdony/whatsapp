@@ -13,13 +13,13 @@
 
         <form class="form-signin" method="post">
             <div class="text-center mb-4">
-                <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+                <h1 class="h3 mb-3 font-weight-normal">{% trans 'Register' %}</h1>
             </div>
             {% csrf_token %}
             {{ form.as_p }}
-            <button class="btn btn-lg btn-success btn-block" type="submit">Register</button>
+            <button class="btn btn-lg btn-success btn-block" type="submit">{% trans 'Register' %}</button>
             <hr>
-            <a href="{% url 'login' %}" class="btn btn-primary btn-block">Sign in</a>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-block">{% trans 'Sign in' %}</a>
         </form>
 {% endblock %}
    {% block footer %}

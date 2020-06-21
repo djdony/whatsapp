@@ -94,10 +94,6 @@ class MyAdminSite(admin.AdminSite):
         app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
         all_list = super().get_app_list(request)
 
-        # Sort the models alphabetically within each app.
-        for app in app_list:
-            app['models'].sort(key=lambda x: ordering[x['name']])
-
         return app_list
 
 

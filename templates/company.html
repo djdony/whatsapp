@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% load static %}
+{% load static i18n%}
 
 {% block content %}
         <div class="row">
@@ -32,10 +32,10 @@
                                         <h5 class="card-title">{{ company.name }}</h5>
                                         <p class="card-text">{{ company.city }}</p>
 
-                                        <a href="{% url 'company_edit' slug=company.slug %}" class="btn btn-primary">Edit</a>
-                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-href="{% url 'company_delete' slug=company.slug %}" data-target="#confirm-delete">
-  Delete
-</button>
+                                        <a href="{% url 'company_edit' slug=company.slug %}" class="btn btn-primary">{% trans 'Edit' %}</a>
+                                        <button type="button" class="btn btn-danger" data-toggle="modal" data-href="{% url 'company_delete' slug=company.slug %}" data-target="#confirm-delete">
+                                          {% trans 'Delete' %}
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -45,7 +45,7 @@
                 {% endif %}
             <div class="col-md-9">
                 <div class="row mt-5 justify-content-center">
-                    <a href="{% url 'company_add' %}" class="btn btn-primary">Add Company</a>
+                    <a href="{% url 'company_add' %}" class="btn btn-primary">{% trans 'Add' %}</a>
                 </div>
             </div>
 
