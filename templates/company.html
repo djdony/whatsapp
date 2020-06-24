@@ -31,8 +31,9 @@
                                         {% endif %}
                                         <h5 class="card-title">{{ company.name }}</h5>
                                         <p class="card-text">{{ company.city }}</p>
-
+                                    {% if perms.settings.change_company %}
                                         <a href="{% url 'company_edit' slug=company.slug %}" class="btn btn-primary">{% trans 'Edit' %}</a>
+                                    {% endif %}
                                         <button type="button" class="btn btn-danger" data-toggle="modal" data-href="{% url 'company_delete' slug=company.slug %}" data-target="#confirm-delete">
                                           {% trans 'Delete' %}
                                         </button>
@@ -45,7 +46,9 @@
                 {% endif %}
             <div class="col-md-9">
                 <div class="row mt-5 justify-content-center">
+                    {% if perms.settings.add_company %}
                     <a href="{% url 'company_add' %}" class="btn btn-primary">{% trans 'Add' %}</a>
+                    {% endif %}
                 </div>
             </div>
 

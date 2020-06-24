@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from django.contrib.admin import AdminSite, sites
+from django.utils.safestring import mark_safe
 from django.utils.translation import ngettext
 from datetime import datetime
 
@@ -50,10 +51,18 @@ class CompanyAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super(CompanyAdmin, self).get_queryset(request).filter(status=1)
 
-    list_display = list_display_links = ['id', 'name', 'company_type', 'city', 'whatsapp', 'email', 'www']
+    list_display = list_display_links = ['id', 'name', 'company_type', 'city', 'whatsapp', 'email', 'www', 'get_logo']
     exclude = ['status']
     search_fields = ('name',)
-    prepopulated_fields = {'slug': ('name',)}  # new
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ['get_logo',  'id']
+
+    def get_logo(self, obj):
+        if obj.logo:
+            return mark_safe(f'<img src={obj.logo.url} width="50">')
+        return '-'
+
+    get_logo.short_description = 'Logo'
 
 
 def make_active(modeladmin, request, queryset):
@@ -76,30 +85,6 @@ def make_disable(modeladmin, request, queryset):
         updated,
     ) % updated, messages.SUCCESS)
 
-
-class MyAdminSite(admin.AdminSite):
-    def get_app_list(self, request):
-        ordering = {
-            "Countries": 1,
-            "Regions": 2,
-            "Cities": 3,
-            "Company Types": 4,
-            "Companies": 5,
-            "Users": 6,
-            "Groups": 7
-        }
-        app_dict = self._build_app_dict(request)
-        # a.sort(key=lambda x: b.index(x[0]))
-        # Sort the apps alphabetically.
-        app_list = sorted(app_dict.values(), key=lambda x: x['name'].lower())
-        all_list = super().get_app_list(request)
-
-        return app_list
-
-
-mysite = MyAdminSite()
-admin.site = mysite
-sites.site = mysite
 
 make_disable.short_description = "Delete selected"
 

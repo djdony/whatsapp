@@ -15,6 +15,16 @@ class DivErrorList(ErrorList):
         return mark_safe(''.join(['<div class="alert alert-danger" role="alert">%s</div>' % e for e in self]))
 
 
+class PictureWidget(forms.widgets.FileInput):
+    def render(self, name, value, attrs=None, **kwargs):
+        input_html = super().render(name, value, attrs=None, **kwargs)
+        if value:
+            img_html = mark_safe(f'<br><br><img src="{value.url}"width="100"/>')
+            return f'{input_html}{img_html}'
+        else:
+            return input_html
+
+
 class CompanyForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         kwargs_new = {'error_class': DivErrorList}
@@ -29,8 +39,7 @@ class CompanyForm(forms.ModelForm):
     company_type = forms.ModelChoiceField(label=_('Company Type'), queryset=CompanyType.objects.all(),
                                           widget=forms.Select(attrs={'class': 'form-control'}))
     email = forms.EmailField(label=_('E-mail'), widget=forms.EmailInput(attrs={'class': 'form-control'}))
-
-    logo = forms.ImageField(label=_('Logo'), required=False)
+    logo = forms.ImageField(label=_('Logo'), required=False, widget=PictureWidget)
 
     class Meta:
         model = Company

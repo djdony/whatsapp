@@ -1,6 +1,6 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -21,13 +21,15 @@ class CompanyUpdate(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
     slug_field = 'slug'
     success_url = reverse_lazy('company')
     success_message = 'Data Updated successfully.'
+    permission_required = ('settings.change_company', )
 
 
-class CompanyAdd(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class CompanyAdd(LoginRequiredMixin, PermissionRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = CompanyForm
     template_name = 'partials/form.html'
     success_url = reverse_lazy('company')
     success_message = 'Data Inserted successfully.'
+    permission_required = ('settings.add_company',)
 
     def form_valid(self, form):
         company = form.save()
@@ -35,16 +37,17 @@ class CompanyAdd(LoginRequiredMixin, SuccessMessageMixin, CreateView):
         return super(CompanyAdd, self).form_valid(form)
 
 
-class CompanyList(LoginRequiredMixin, ListView):
+class CompanyList(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Company
     template_name = 'company.html'
     context_object_name = 'companies'
+    permission_required = ('settings.change_company',)
 
     def get_queryset(self):
         return Company.objects.filter(users__exact=self.request.user, status__exact=1)
 
 
-@login_required
+@permission_required("settings.delete_company")
 def company_delete(request, slug):
     user_company = get_object_or_404(Company, slug=slug, users=request.user)
     user_company.status = 0
